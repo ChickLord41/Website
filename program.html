@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Program Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.4s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+  <div class="max-w-3xl mx-auto px-4 py-10">
+    <a href="index.html" class="text-blue-600 hover:underline text-sm flex items-center mb-4">
+      <i class="fas fa-arrow-left mr-2"></i> Back to Gallery
+    </a>
+
+    <div id="program-details" class="p-6 bg-white rounded-xl shadow-md fade-in">
+      <p class="text-gray-500">Loading...</p>
+    </div>
+  </div>
+
+  <script>
+    const detailsContainer = document.getElementById('program-details');
+    const params = new URLSearchParams(window.location.search);
+    const programId = parseInt(params.get('id'));
+
+    fetch('programs.json')
+      .then(res => res.json())
+      .then(programs => {
+        const program = programs.find(p => p.id === programId);
+
+        if (!program) {
+          detailsContainer.innerHTML = `
+            <div class="text-center py-8">
+              <i class="fas fa-exclamation-circle text-4xl text-red-400 mb-2"></i>
+              <p class="text-red-600 font-semibold text-lg">Program not found.</p>
+            </div>
+          `;
+          return;
+        }
+
+        detailsContainer.innerHTML = `
+          <h1 class="text-3xl font-bold mb-3 text-primary">${program.name}</h1>
+          <p class="text-gray-600 text-base mb-4 leading-relaxed">${program.description}</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700 mb-6">
+            <div><strong>Category:</strong> ${program.category}</div>
+            <div><strong>Downloads:</strong> ${program.downloads.toLocaleString()}</div>
+            <div><strong>Added:</strong> ${program.added}</div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 mb-6">
+            ${program.tags.map(tag => `
+              <span class="bg-gray-200 hover:bg-blue-600 hover:text-white px-3 py-1 rounded-full text-sm transition">${tag}</span>
+            `).join('')}
+          </div>
+
+          <a href="${program.zip}" download
+            class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-5 rounded-lg inline-flex items-center text-sm shadow-md transition">
+            <i class="fas fa-file-archive mr-2"></i> Download ZIP
+          </a>
+        `;
+      })
+      .catch(error => {
+        console.error(error);
+        detailsContainer.innerHTML = `
+          <div class="text-red-500 text-center">
+            <i class="fas fa-bug text-2xl mb-2"></i>
+            <p>Failed to load program data.</p>
+          </div>
+        `;
+      });
+  </script>
+
+</body>
+</html>
