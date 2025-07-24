@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Python Programs Gallery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .program-card:hover .program-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .program-actions {
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .search-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+    <div class="container mx-auto px-4 py-6">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="flex items-center mb-4 md:mb-0">
+          <i class="fab fa-python text-4xl mr-3"></i>
+          <h1 class="text-3xl font-bold">Python Programs</h1>
+        </div>
+        <div class="relative w-full md:w-64">
+          <input type="text" placeholder="Search programs..." 
+                 class="search-input w-full px-4 py-2 rounded-full text-gray-800 focus:outline-none">
+          <i class="fas fa-search absolute right-3 top-2.5 text-gray-500"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="programs-container">
+      <!-- Program cards will be injected here -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8 mt-12">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <h2 class="text-xl font-bold mb-2">Python Programs Gallery</h2>
+          <p class="text-gray-400">Browse and download my collection of Python programs</p>
+        </div>
+        <div class="flex space-x-4">
+          <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-github text-2xl"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-linkedin text-2xl"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter text-2xl"></i></a>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400">
+        <p>&copy; 2025 Python Programs Gallery. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal -->
+  <div id="download-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-800">Download Program</h3>
+        <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="mb-4">
+        <p class="text-gray-700" id="modal-program-name">Program Name</p>
+        <p class="text-sm text-gray-500 mt-1" id="modal-program-desc">Description will appear here</p>
+      </div>
+      <div>
+        <a href="#" id="zip-download-link" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded text-center block transition">
+          <i class="fas fa-file-archive mr-2"></i> Download ZIP
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    let programs = [];
+
+    const programsContainer = document.getElementById('programs-container');
+    const searchInput = document.querySelector('.search-input');
+    const downloadModal = document.getElementById('download-modal');
+    const closeModal = document.getElementById('close-modal');
+    const modalProgramName = document.getElementById('modal-program-name');
+    const modalProgramDesc = document.getElementById('modal-program-desc');
+    const zipDownloadLink = document.getElementById('zip-download-link');
+
+    fetch('./programs.json')
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        programs = data;
+        displayPrograms(programs);
+      })
+      .catch(error => {
+        console.error('Failed to load programs.json:', error);
+        programsContainer.innerHTML = `
+          <div class="col-span-full text-center py-12 text-red-600">
+            Failed to load programs. Please try again later.
+          </div>
+        `;
+      });
+
+    searchInput.addEventListener('input', e => {
+      const searchTerm = e.target.value.toLowerCase();
+      const filtered = programs.filter(p =>
+        p.name.toLowerCase().includes(searchTerm) ||
+        p.description.toLowerCase().includes(searchTerm) ||
+        p.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+      );
+      displayPrograms(filtered);
+    });
+
+    function displayPrograms(data) {
+      programsContainer.innerHTML = '';
+      if (data.length === 0) {
+        programsContainer.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <i class="fas fa-search text-5xl text-gray-400 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-700">No programs found</h3>
+            <p class="text-gray-500">Try adjusting your search or keywords.</p>
+          </div>`;
+        return;
+      }
+
+      data.forEach((program, i) => {
+        const card = document.createElement('div');
+        card.className = 'program-card bg-white rounded-lg shadow hover:shadow-xl transition overflow-hidden animate-fade-in';
+        card.style.animationDelay = `${i * 0.1}s`;
+
+        card.innerHTML = `
+          <div class="p-4">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="text-lg font-bold text-blue-700">${program.name}</h3>
+              <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${program.category}</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-3">${program.description}</p>
+            <div class="flex flex-wrap gap-1 text-xs mb-4">
+              ${program.tags.map(tag => `<span class="bg-gray-100 px-2 py-1 rounded">${tag}</span>`).join('')}
+            </div>
+            <div class="flex justify-between text-sm text-gray-500">
+              <span><i class="fas fa-download mr-1"></i>${program.downloads.toLocaleString()}</span>
+              <span>Added: ${program.added}</span>
+            </div>
+          </div>
+          <div class="program-actions bg-gray-50 px-4 py-3 flex justify-between">
+            <button class="view-btn px-3 py-1 bg-gray-200 rounded text-sm hover:bg-gray-300 transition" data-id="${program.id}">
+              <i class="fas fa-eye mr-1"></i> View
+            </button>
+            <button class="download-btn px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition" data-id="${program.id}">
+              <i class="fas fa-download mr-1"></i> Download
+            </button>
+          </div>
+        `;
+        programsContainer.appendChild(card);
+      });
+
+      addEventListeners();
+    }
+
+    function addEventListeners() {
+      document.querySelectorAll('.download-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = parseInt(e.currentTarget.dataset.id);
+          const program = programs.find(p => p.id === id);
+          if (program) showModal(program);
+        });
+      });
+
+      document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = parseInt(e.currentTarget.dataset.id);
+          window.location.href = `program.html?id=${id}`;
+        });
+      });
+    }
+
+    function showModal(program) {
+      modalProgramName.textContent = program.name;
+      modalProgramDesc.textContent = program.description;
+      zipDownloadLink.href = program.zip;
+      downloadModal.classList.remove('hidden');
+    }
+
+    closeModal.addEventListener('click', () => {
+      downloadModal.classList.add('hidden');
+    });
+
+    downloadModal.addEventListener('click', e => {
+      if (e.target === downloadModal) {
+        downloadModal.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
