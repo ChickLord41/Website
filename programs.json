@@ -18,5 +18,15 @@
     "downloads": 23,
     "zip": "programs/weather.zip",
     "added": "2025-07-24"
+  },
+  {
+    "id": 3,
+    "name": "Launcher Bypasser",
+    "description": "A python program to bypass various game launchers",
+    "category": "Game",
+    "tags": ["Gaming", "Python", "Bypass"],
+    "downloads": 12,
+    "zip": "programs/Bypass.zip",
+    "added": "2025-07-30"
   }
 ]
