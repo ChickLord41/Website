@@ -28,6 +28,16 @@
     "downloads": 11,
     "zip": "programs/Password_Manager.zip",
     "added": "2025-09-09"
+  },
+  {
+    "id": 4,
+    "name": "Quadratic Calculator",
+    "description": "A calculator to solve and graph quadratic equations",
+    "category": "Math",
+    "tags": ["Math", "Python"],
+    "downloads": 7,
+    "zip": "programs/Quadratic_Calculator.zip",
+    "added": "2025-08-10"
   }
 ]
 
